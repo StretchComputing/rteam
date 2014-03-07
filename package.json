@@ -1,0 +1,34 @@
+{
+  "name": "rteam",
+  "version": "0.1.0",
+  "description": "core rTeam coop app that supports portfolios and connections",
+  "main": "index",
+  "scripts": {
+    "test": "testRteam",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:StretchComputing/rteam.git"
+  },
+  "keywords": [
+    "coop"
+  ],
+  "author": "Joe Wroblewski",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/StretchComputing/rteam/issues"
+  },
+  "dependencies": {
+  		"restify":  "2.6.x",
+  		"neo4j":  "1.1.x"
+	},
+	"devDependencies": {
+		"mocha": "0.3.x"
+	},
+	"engine": {
+		"node": "0.10.x",
+		"npm":  "1.3.x"
+	},
+  "homepage": "https://github.com/StretchComputing/rteam"
+}
