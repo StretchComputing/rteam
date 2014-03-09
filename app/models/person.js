@@ -41,8 +41,26 @@ Object.defineProperty(Person.prototype, 'name', {
     }
 });
 
-// private instance methods:
+Object.defineProperty(Person.prototype, 'photoPath', {
+    get: function () {
+        return this._node.data['photoPath'];
+    },
+    set: function (photoPath) {
+        this._node.data['photoPath'] = photoPath;
+    }
+});
 
+Object.defineProperty(Person.prototype, 'voiceSignatureId', {
+    get: function () {
+        return this._node.data['voiceSignatureId'];
+    },
+    set: function (voiceSignatureId) {
+        this._node.data['voiceSignatureId'] = voiceSignatureId;
+    }
+});
+
+// private instance methods:
+// example code: not used in rTeam
 Person.prototype._getExpertInRel = function (skill, callback) {
     var query = [
         'START person=node({personId}), skill=node({skillId})',
@@ -73,18 +91,21 @@ Person.prototype.save = function (callback) {
     });
 };
 
+// example code: not used in rTeam
 Person.prototype.del = function (callback) {
     this._node.del(function (err) {
         callback(err);
     }, true);   // true = yes, force it (delete all relationships)
 };
 
+// example code: not used in rTeam
 Person.prototype.follow = function (other, callback) {
     this._node.createRelationshipTo(other._node, 'follows', {}, function (err, rel) {
         callback(err);
     });
 };
 
+// example code: not used in rTeam
 Person.prototype.unfollow = function (other, callback) {
     this._getFollowingRel(other, function (err, rel) {
         if (err) return callback(err);
@@ -97,6 +118,7 @@ Person.prototype.unfollow = function (other, callback) {
 
 // calls callback w/ (err, following, others) where following is an array of
 // users this user follows, and others is all other users minus him/herself.
+// example code: not used in rTeam
 Person.prototype.getFollowingAndOthers = function (callback) {
     // query all users and whether we follow each one or not:
     var query = [
@@ -140,6 +162,7 @@ Person.prototype.getFollowingAndOthers = function (callback) {
 ///////////////////////////////////////////////////////
 // static methods: methods of the constructor function
 ///////////////////////////////////////////////////////
+// example code: not used in rTeam
 Person.get = function (id, callback) {
     db.getNodeById(id, function (err, node) {
         if (err) return callback(err);
@@ -147,6 +170,7 @@ Person.get = function (id, callback) {
     });
 };
 
+// example code: not used in rTeam
 Person.getAll = function (callback) {
     db.getIndexedNodes(INDEX_NAME, INDEX_KEY, INDEX_VAL, function (err, nodes) {
         // if (err) return callback(err);
@@ -165,6 +189,7 @@ Person.getAll = function (callback) {
 
 // Create Person
 // required fields were validated by calling routine, so no need to do it here
+// person parm: JS object containing all person properties to persist
 Person.create = function (person, callback) {
 		console.log("entering Person.create()");
     var query = [
@@ -180,7 +205,7 @@ Person.create = function (person, callback) {
         // key of return node comes from "RETURN n" in cypher query above
         var node = results[0].n;
         var person = new Person(node);
-				callback(null, personIdn);
+				callback(null, person);
 
 				// don't see why any of the following code is needed. The save seems redundant with the Cypher code above.
         //node.save(function (err) {
