@@ -1,5 +1,5 @@
 var neo4j = require('neo4j');
-var server = require("./server/server");
+var server = require("./app/server");
 
 server.start();
 var db = new neo4j.GraphDatabase('http://localhost:7474');
