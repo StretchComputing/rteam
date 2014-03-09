@@ -1,3 +1,5 @@
+'use strict';
+
 var Person = require('./models/person');
 
 // handles POST: /persons
@@ -11,12 +13,17 @@ exports.create = function (req, res , next){
 	var voiceSignatureId = "123456890";
 
 	Person.create({
-      name: req.body.name,
+      name: req.params.name,
       photoPath: photoPath,
       voiceSignatureId: voiceSignatureId
   }, function (err, person) {
       if (err) return next(err);
-      // TODO bulid JSON return
+      res.send(201, {
+        name: person.name,
+        photoPath: person.photoPath,
+        voiceSignatureId: person.voiceSignatureId
+      });
+      return next();
   });
 };
 

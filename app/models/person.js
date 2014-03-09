@@ -201,6 +201,7 @@ Person.create = function (person, callback) {
         props: person,
     };
     db.query(query, params, function (err, results) {
+        console.log('entering db.query callback');
         if(err) return callback(err);
         // key of return node comes from "RETURN n" in cypher query above
         var node = results[0].n;
