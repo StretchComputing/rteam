@@ -37,8 +37,8 @@ function start() {
 	//////////
 
 	// hello resource routing
-	server.get('/hello/:name', hello.world);
-	server.head('/hello/:name', hello.world);
+	server.get('/hello/:name', hello);
+	server.head('/hello/:name', hello);
 
 	// person resource routing
 	var PERSON_PATH = '/persons'
