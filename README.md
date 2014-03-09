@@ -26,27 +26,29 @@ developers
 1. clone the rTeam github repository:  git clone git@github.com:StretchComputing/rteam.git
 2. Install VirtualBox (if not already installed)
 3. Install vagrant (see resources below).
-4. In the rTeam home directory, provision the rTeam vagrant VM:  vagrant up
+4. Download saucy64.box -- do NOT put this in the git project!!!!!  (get saucy64.box from Joe)
+5. run: vagrant init saucy64.box  (do this in the directory containing saucy64.box file)
+6. In the rTeam home directory, provision the rTeam vagrant VM:  vagrant up
    - the vagrant vm is built on top of saucy64 -- a 64 bit server version of Linux (13.x)
    - vagrant supports directory sharing.  The home directory of rTeam on your host machine is mapped to /vagrant on the guest vm
    - the vagrant vm is configured to forware port 5555 on the host to port 8888 on the guest.
    - the vagrant vm is configured with IP address:  192.168.55.55
-5. To access the rTeam VM, ssh in:  vagrant ssh  (in the home directory of rTeam project on the host machine)
-6. Install/update packages via package.json.  Go to directory /vagrant, run: npm install.
-7. To run rTeam, do the following:
+7. To access the rTeam VM, ssh in:  vagrant ssh  (in the home directory of rTeam project on the host machine)
+8. Install/update packages via package.json.  Go to directory /vagrant, run: npm install.
+9. To run rTeam, do the following:
    - vagrant ssh
    - neo4j should already be running.  you can verify via:  sudo service neo4j-service status
    - to restart neo4j:  sudo service neo4j-service restart
    - go to the shared directory: cd /vagrant
    - start the server: ./runNode.sh  (node.js is configured to listen to port 8888 and will run until you hit cntrl-C)
      NOTE: to run directly via the command line: nodejs index.js
-8. From the host machine, node.js can be accessed in two ways:
-   - http://localhost:5555  (via port forwarding)
-   - http://192.168.55.55   (via IP address of rTeam vm)
-9. rTeam has a hello world API that can test your installation
-   - from the host machine, enter URL in browser:  192.168.55.55:8888/hello/world
-   - plain text "hello world" should be displayed
-10. Access the neo4j web interface at http://192.168.55.55:7474. Allows queries and browsing of graph database
+10. From the host machine, node.js can be accessed in two ways:
+    - http://localhost:5555  (via port forwarding)
+    - http://192.168.55.55   (via IP address of rTeam vm)
+11. rTeam has a hello world API that can test your installation
+    - from the host machine, enter URL in browser:  192.168.55.55:8888/hello/world
+    - plain text "hello world" should be displayed
+12. Access the neo4j web interface at http://192.168.55.55:7474. Allows queries and browsing of graph database
     blog post and help:  http://blog.neo4j.org/2013/10/neo4j-200-m06-introducing-neo4js-browser.html
 
 =========
