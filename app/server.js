@@ -46,6 +46,10 @@ function start() {
 	server.post({path : PERSON_PATH , version: '0.1.0'}, person.create);
 	//server.del({path : PERSON_PATH +'/:jobId' , version: '0.1.0'} ,deleteJob);
 
+	// static files
+	server.get(/\/?.*/, restify.serveStatic({ directory: './public', default: 'index.html' }));
+
+
 	///////////////
 	// start server
 	///////////////
