@@ -16,11 +16,11 @@ var EXPERIENCE_WITH_REL = 'experienceWith';
 var LEARNING_REL = 'learning';
 
 // constructor is exported: this allows other modules to call the static methods defined below
-var Person = module.exports = function Person(_node) {
+var Person = module.exports = function (_node) {
     // all we'll really store is the node; the rest of our properties will be
     // derivable or just pass-through properties (see below).
     this._node = _node;
-}
+};
 
 // public instance properties:
 
@@ -34,28 +34,28 @@ Object.defineProperty(Person.prototype, 'exists', {
 
 Object.defineProperty(Person.prototype, 'name', {
     get: function () {
-        return this._node.data['name'];
+        return this._node.data.name;
     },
     set: function (name) {
-        this._node.data['name'] = name;
+        this._node.data.name = name;
     }
 });
 
 Object.defineProperty(Person.prototype, 'photoPath', {
     get: function () {
-        return this._node.data['photoPath'];
+        return this._node.data.photoPath;
     },
     set: function (photoPath) {
-        this._node.data['photoPath'] = photoPath;
+        this._node.data.photoPath = photoPath;
     }
 });
 
 Object.defineProperty(Person.prototype, 'voiceSignatureId', {
     get: function () {
-        return this._node.data['voiceSignatureId'];
+        return this._node.data.voiceSignatureId;
     },
     set: function (voiceSignatureId) {
-        this._node.data['voiceSignatureId'] = voiceSignatureId;
+        this._node.data.voiceSignatureId = voiceSignatureId;
     }
 });
 

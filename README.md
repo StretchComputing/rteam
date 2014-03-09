@@ -61,3 +61,9 @@ c. restify documentation: http://mcavage.me/node-restify/
 d. neo4j manual: http://docs.neo4j.org/chunked/stable/index.html
 e. site describing various node project structures:  https://gist.github.com/viatropos/1398757
 
+===========
+Open Issues
+===========
+1. Are all directories open in a node deployment?
+2. Does node have any support for deployment in general?
+

@@ -11,10 +11,10 @@ exports.create = function (req, res , next){
 	var voiceSignatureId = "123456890";
 
 	Person.create({
-      name: req.body['name'],
+      name: req.body.name,
       photoPath: photoPath,
       voiceSignatureId: voiceSignatureId
-  }, function (err, user) {
+  }, function (err, person) {
       if (err) return next(err);
       // TODO bulid JSON return
   });
