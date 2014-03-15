@@ -19,18 +19,32 @@
   <![endif]-->
 
   <h1>rTeam Admin!</h1>
-  <button id="createPerson">Create Person</button>
+  <form id="createPerson">
+    <input type="file"><br>
+    <input type="hidden" id="base64image">
+    <img src="" height="200" alt="Image preview..."><br>
+    <button type="submit">Create Person</button>
+  </form>
 
 <script src="//code.jquery.com/jquery-2.1.0.min.js"></script>
 <script>
 (function () {
   'use strict';
 
-  var createPerson = function () {
+  var createPerson = function (event) {
+        event.preventDefault();
+        if (!$('#base64image').val()) {
+          alert('Please select an image');
+          return;
+        }
+
         $.ajax({
           type: 'POST',
           url: '/persons',
-          data: { name: 'rTeam Member' },
+          data: {
+            name: 'rTeam Member',
+            photoPath: $('#base64image').val()
+          },
           success: function (data) {
             console.log(data);
           },
@@ -38,9 +52,28 @@
             console.error(jqXHR, status);
           }
         });
+      },
+
+      previewFile = function () {
+        var $preview = $('img'),
+            file = $('#createPerson input[type=file]')[0].files[0],
+            // file    = $('input[type=file]')[0].files[0],
+            reader  = new FileReader();
+
+        reader.onloadend = function () {
+          $preview.prop('src', reader.result);
+          $('#base64image').val(reader.result);
+        };
+
+        if (file) {
+          reader.readAsDataURL(file);
+        } else {
+          $preview.prop('src', '');
+        }
       };
 
-  $('#createPerson').on('click', createPerson);
+  $('#createPerson').on('submit', createPerson);
+  $('#createPerson input[type=file]').on('change', previewFile);
 }());
 </script>
 </body>

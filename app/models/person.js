@@ -1,3 +1,4 @@
+'use strict';
 // person.js
 // Person model logic.
 
@@ -19,41 +20,43 @@ var LEARNING_REL = 'learning';
 var Person = module.exports = function (theNode) {
   var node = theNode;
 
-	// privileged methods
-	Object.defineProperty(Person.prototype, 'id', {
-		get: function () { return node.id; }
-	});
+	if (!Person.prototype.id) {
+		// privileged methods
+		Object.defineProperty(Person.prototype, 'id', {
+			get: function () { return node.id; }
+		});
 
-	Object.defineProperty(Person.prototype, 'exists', {
-		get: function () { return node.exists; }
-	});
+		Object.defineProperty(Person.prototype, 'exists', {
+			get: function () { return node.exists; }
+		});
 
-	Object.defineProperty(Person.prototype, 'name', {
+		Object.defineProperty(Person.prototype, 'name', {
 			get: function () {
 				return node.data.name;
 			},
 			set: function (name) {
 				node.data.name = name;
 			}
-	});
+		});
 
-	Object.defineProperty(Person.prototype, 'photoPath', {
+		Object.defineProperty(Person.prototype, 'photoPath', {
 			get: function () {
 				return node.data.photoPath;
 			},
 			set: function (photoPath) {
 				node.data.photoPath = photoPath;
 			}
-	});
+		});
 
-	Object.defineProperty(Person.prototype, 'voiceSignatureId', {
+		Object.defineProperty(Person.prototype, 'voiceSignatureId', {
 			get: function () {
 				return node.data.voiceSignatureId;
 			},
 			set: function (voiceSignatureId) {
 				node.data.voiceSignatureId = voiceSignatureId;
 			}
-	});
+		});
+	}
 };
 
 
