@@ -16,48 +16,46 @@ var EXPERIENCE_WITH_REL = 'experienceWith';
 var LEARNING_REL = 'learning';
 
 // constructor is exported: this allows other modules to call the static methods defined below
-var Person = module.exports = function (_node) {
-    // all we'll really store is the node; the rest of our properties will be
-    // derivable or just pass-through properties (see below).
-    this._node = _node;
+var Person = module.exports = function (theNode) {
+  var node = theNode;
+
+	// privileged methods
+	Object.defineProperty(Person.prototype, 'id', {
+		get: function () { return node.id; }
+	});
+
+	Object.defineProperty(Person.prototype, 'exists', {
+		get: function () { return node.exists; }
+	});
+
+	Object.defineProperty(Person.prototype, 'name', {
+			get: function () {
+				return node.data.name;
+			},
+			set: function (name) {
+				node.data.name = name;
+			}
+	});
+
+	Object.defineProperty(Person.prototype, 'photoPath', {
+			get: function () {
+				return node.data.photoPath;
+			},
+			set: function (photoPath) {
+				node.data.photoPath = photoPath;
+			}
+	});
+
+	Object.defineProperty(Person.prototype, 'voiceSignatureId', {
+			get: function () {
+				return node.data.voiceSignatureId;
+			},
+			set: function (voiceSignatureId) {
+				node.data.voiceSignatureId = voiceSignatureId;
+			}
+	});
 };
 
-// public instance properties:
-
-Object.defineProperty(Person.prototype, 'id', {
-    get: function () { return this._node.id; }
-});
-
-Object.defineProperty(Person.prototype, 'exists', {
-    get: function () { return this._node.exists; }
-});
-
-Object.defineProperty(Person.prototype, 'name', {
-    get: function () {
-        return this._node.data.name;
-    },
-    set: function (name) {
-        this._node.data.name = name;
-    }
-});
-
-Object.defineProperty(Person.prototype, 'photoPath', {
-    get: function () {
-        return this._node.data.photoPath;
-    },
-    set: function (photoPath) {
-        this._node.data.photoPath = photoPath;
-    }
-});
-
-Object.defineProperty(Person.prototype, 'voiceSignatureId', {
-    get: function () {
-        return this._node.data.voiceSignatureId;
-    },
-    set: function (voiceSignatureId) {
-        this._node.data.voiceSignatureId = voiceSignatureId;
-    }
-});
 
 // private instance methods:
 // example code: not used in rTeam
@@ -86,21 +84,21 @@ Person.prototype._getExpertInRel = function (skill, callback) {
 ///////////////////////////////////////////////////////////////////////////
 
 Person.prototype.save = function (callback) {
-    this._node.save(function (err) {
+    node.save(function (err) {
         callback(err);
     });
 };
 
 // example code: not used in rTeam
 Person.prototype.del = function (callback) {
-    this._node.del(function (err) {
+    node.del(function (err) {
         callback(err);
     }, true);   // true = yes, force it (delete all relationships)
 };
 
 // example code: not used in rTeam
 Person.prototype.follow = function (other, callback) {
-    this._node.createRelationshipTo(other._node, 'follows', {}, function (err, rel) {
+    node.createRelationshipTo(other.node, 'follows', {}, function (err, rel) {
         callback(err);
     });
 };
