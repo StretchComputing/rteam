@@ -2,19 +2,21 @@
 // person.js
 // Person model logic.
 
-var neo4j = require('neo4j');
-// TODO  keep db definition in this file?
-var db = new neo4j.GraphDatabase(process.env.NEO4J_URL || 'http://localhost:7474');
+var neo4j = require('neo4j'),
+		// TODO  keep db definition in this file?
+		db = new neo4j.GraphDatabase(process.env.NEO4J_URL || 'http://localhost:7474'),
+		fs = require('fs'),
 
-// constants:
-
-var INDEX_NAME = 'nodes';
-var INDEX_KEY = 'type';
-var INDEX_VAL = 'person';
-
-var EXPERT_IN_REL = 'expertIn';
-var EXPERIENCE_WITH_REL = 'experienceWith';
-var LEARNING_REL = 'learning';
+	// Sublime linter has weird rules about indenting literals.
+	constants = Object.freeze({
+		indexName: 'nodes',
+		indexKey: 'type',
+		indexVal: 'person',
+		expertInRel: 'expertIn',
+		experienceWithRel: 'experienceWith',
+		learningRel: 'learning',
+		imagePath: './filestore/images/'
+	});
 
 // constructor is exported: this allows other modules to call the static methods defined below
 var Person = module.exports = function (theNode) {
@@ -39,12 +41,21 @@ var Person = module.exports = function (theNode) {
 			}
 		});
 
-		Object.defineProperty(Person.prototype, 'photoPath', {
+		Object.defineProperty(Person.prototype, 'uniqId', {
+			// TODO support generating this from name/phone/email qualifiier.
+			get: function () { return node.data.name.replace(' ', '.'); }
+		});
+
+		Object.defineProperty(Person.prototype, 'base64image', {
 			get: function () {
-				return node.data.photoPath;
+				fs.readFile(constants.imagePath + this.uniqId, function (err, data) {
+					if (err) { throw err; }
+					console.log('Person.get.base64image', 'succeeded');
+					return data;
+				});
 			},
-			set: function (photoPath) {
-				node.data.photoPath = photoPath;
+			set: function (base64image) {
+				this.saveImage(base64image);
 			}
 		});
 
@@ -63,23 +74,23 @@ var Person = module.exports = function (theNode) {
 // private instance methods:
 // example code: not used in rTeam
 Person.prototype._getExpertInRel = function (skill, callback) {
-    var query = [
-        'START person=node({personId}), skill=node({skillId})',
-        'MATCH (person) -[rel?:EXPERT_IN_REL]-> (skill)',
-        'RETURN rel'
-    ].join('\n')
-        .replace('EXPERT_IN_REL', EXPERT_IN_REL);
+	var query = [
+			'START person=node({personId}), skill=node({skillId})',
+			'MATCH (person) -[rel?:EXPERT_IN_REL]-> (skill)',
+			'RETURN rel'
+		].join('\n')
+		.replace('EXPERT_IN_REL', constants.expertInRel),
 
-    var params = {
-        userId: this.id,
-        otherId: other.id,
-    };
+		params = {
+			userId: this.id,
+			otherId: other.id,
+		};
 
-    db.query(query, params, function (err, results) {
-        if (err) return callback(err);
-        var rel = results[0] && results[0]['rel'];
-        callback(null, rel);
-    });
+	db.query(query, params, function (err, results) {
+		if (err) { return callback(err); }
+		var rel = results[0] && results[0].rel;
+		callback(null, rel);
+	});
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -127,10 +138,10 @@ Person.prototype.getFollowingAndOthers = function (callback) {
         'MATCH (user) -[rel?:FOLLOWS_REL]-> (other)',
         'RETURN other, COUNT(rel)'  // COUNT(rel) is a hack for 1 or 0
     ].join('\n')
-        .replace('INDEX_NAME', INDEX_NAME)
-        .replace('INDEX_KEY', INDEX_KEY)
-        .replace('INDEX_VAL', INDEX_VAL)
-        .replace('FOLLOWS_REL', FOLLOWS_REL);
+        .replace('INDEX_NAME', constants.indexName)
+        .replace('INDEX_KEY', constants.indexKey)
+        .replace('INDEX_VAL', constants.indexVal)
+        .replace('FOLLOWS_REL', constants.followsRel);
 
     var params = {
         userId: this.id,
@@ -173,7 +184,7 @@ Person.get = function (id, callback) {
 
 // example code: not used in rTeam
 Person.getAll = function (callback) {
-    db.getIndexedNodes(INDEX_NAME, INDEX_KEY, INDEX_VAL, function (err, nodes) {
+    db.getIndexedNodes(constants.indexName, constants.indexKey, constants.indexVal, function (err, nodes) {
         // if (err) return callback(err);
         // FIXME the index might not exist in the beginning, so special-case
         // this error detection. warning: this is super brittle!
@@ -190,33 +201,41 @@ Person.getAll = function (callback) {
 
 // Create Person
 // required fields were validated by calling routine, so no need to do it here
-// person parm: JS object containing all person properties to persist
+// person parm: JS object literal containing all person properties to persist
 Person.create = function (person, callback) {
-		console.log("entering Person.create()");
-    var query = [
-        "CREATE (n:TYPE {props})",
-        "RETURN n",
-    ].join('\n')
-        .replace('TYPE','PERSON');
-    var params = {
-        props: person,
-    };
-    db.query(query, params, function (err, results) {
-        console.log('entering db.query callback');
-        if(err) return callback(err);
-        // key of return node comes from "RETURN n" in cypher query above
-        var node = results[0].n;
-        var person = new Person(node);
-				callback(null, person);
+	console.log('entering Person.create()');
+	var query = [
+			'CREATE (n:TYPE {props})',
+			'RETURN n',
+		].join('\n')
+		.replace('TYPE', 'PERSON'),
 
-				// don't see why any of the following code is needed. The save seems redundant with the Cypher code above.
-        //node.save(function (err) {
-            //if (err) return callback(err);
-            // for neo4j 2.0, there's auto auto-indexingg
-            //node.index(INDEX_NAME, INDEX_KEY, INDEX_VAL, function (err) {
-            //    if (err) return callback(err);
-                		//callback(null, user);
-            //});
-        //});
-    });
+		base64image = person.base64image,
+
+		params = {
+			props: {
+				name: person.name,
+				voiceSignatureId: person.voiceSignatureId
+			}
+		};
+
+	db.query(query, params, function (err, results) {
+		console.log('entering db.query callback');
+		if (err) { return callback(err); }
+    // key of return node comes from "RETURN n" in cypher query above
+    var node = results[0].n,
+				person = new Person(node);
+
+		// person.base64image = base64image;
+		person.saveImage(base64image);
+
+    callback(null, person);
+	});
+};
+
+Person.prototype.saveImage = function (base64image) {
+	fs.writeFile(constants.imagePath + this.uniqId, base64image, function (err) {
+		if (err) { throw err; }
+		console.log('saveImage', 'file written successfully');
+	});
 };
