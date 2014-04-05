@@ -19,11 +19,24 @@
   <![endif]-->
 
   <h1>rTeam Admin!</h1>
+
+  <h2>Create Person</h2>
   <form id="createPerson">
+  	<label style="margin-right:5px;">name:</label><input type="text" id="name"><br>
+  	<label style="margin-right:5px;">device signature:</label>
+  	<input type="text" id="deviceSignature" value="1234567"><br>
+  	<label style="margin-right:5px;">voice signature id:</label>
+  	<input type="text" id="voiceSignatureId" value="abcdefg"><br>
     <input type="file"><br>
     <input type="hidden" id="base64image">
     <img src="" height="200" alt="Image preview..."><br>
     <button type="submit">Create Person</button>
+  </form>
+
+  <h2>Get Token</h2>
+  <form id="getToken">
+  	<label style="margin-right:5px;">name:</label><input type="text" id="personName"><br>
+    <button type="submit">Get Token</button>
   </form>
 
 <script src="//code.jquery.com/jquery-2.1.0.min.js"></script>
@@ -37,13 +50,19 @@
           alert('Please select an image');
           return;
         }
+        if (!$('#name').val()) {
+          alert('Please enter a name');
+          return;
+        }
 
         $.ajax({
           type: 'POST',
           url: '/persons',
           data: {
-            name: 'rTeam Member',
-            base64image: $('#base64image').val()
+            name: $('#name').val(),
+            base64image: $('#base64image').val(),
+            deviceSignature: $('#deviceSignature').val(),
+            voiceSignatureId: $('#voiceSignatureId').val()
           },
           success: function (data) {
             console.log(data);
@@ -57,7 +76,6 @@
       previewFile = function () {
         var $preview = $('img'),
             file = $('#createPerson input[type=file]')[0].files[0],
-            // file    = $('input[type=file]')[0].files[0],
             reader  = new FileReader();
 
         reader.onloadend = function () {
@@ -70,10 +88,35 @@
         } else {
           $preview.prop('src', '');
         }
+      },
+
+      getToken = function () {
+        event.preventDefault();
+        if (!$('#personName').val()) {
+          alert('Please enter a name');
+          return;
+        }
+
+        $.ajax({
+          type: 'GET',
+          url: '/persons/token',
+          data: {
+            name: $('#personName').val(),
+            // deviceSignature: $('#deviceSignature').val(),
+          },
+          success: function (data) {
+            console.log(data);
+          },
+          error: function (jqXHR, status) {
+            console.error(jqXHR, status);
+          }
+        });
       };
+
 
   $('#createPerson').on('submit', createPerson);
   $('#createPerson input[type=file]').on('change', previewFile);
+  $('#getToken').on('submit', getToken);
 }());
 </script>
 </body>

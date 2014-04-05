@@ -67,6 +67,24 @@ var Person = module.exports = function (theNode) {
 				node.data.voiceSignatureId = voiceSignatureId;
 			}
 		});
+
+		Object.defineProperty(Person.prototype, 'deviceSignature', {
+			get: function () {
+				return node.data.deviceSignature;
+			},
+			set: function (deviceSignature) {
+				node.data.deviceSignature = deviceSignature;
+			}
+		});
+
+		Object.defineProperty(Person.prototype, 'token', {
+			get: function () {
+				return node.data.token;
+			},
+			set: function (token) {
+				node.data.token = token;
+			}
+		});
 	}
 };
 
@@ -215,7 +233,9 @@ Person.create = function (person, callback) {
 		params = {
 			props: {
 				name: person.name,
-				voiceSignatureId: person.voiceSignatureId
+				deviceSignature: person.deviceSignature,
+				voiceSignatureId: person.voiceSignatureId,
+				token: Person.createToken()
 			}
 		};
 
@@ -231,6 +251,40 @@ Person.create = function (person, callback) {
 
     callback(null, person);
 	});
+};
+
+Person.getToken = function (person, callback) {
+	console.log('entering Person.getToken() personName = ', person.name);
+	var query = [
+			'MATCH (n)',
+			'WHERE n.name = {personName}',
+			'RETURN n',
+		].join('\n'),
+
+		params = {
+			personName: person.name
+		};
+
+	db.query(query, params, function (err, results) {
+		console.log('entering getToken db.query callback results = ', results);
+		if (err) { return callback(err); }
+    // key of return node comes from "RETURN n" in cypher query above
+    var node = results[0].n,
+				person = new Person(node);
+
+		// TODO get the base64 image from the file
+		// person.saveImage(base64image);
+		// person.base64image = base64image;
+
+    callback(null, person);
+	});
+};
+
+Person.createToken = function() {
+	// TODO create a 40 character hash
+	var min = 4000000,
+	    max = 10000000000;
+	return Math.random() * (max - min) + min;
 };
 
 Person.prototype.saveImage = function (base64image) {

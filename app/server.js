@@ -1,7 +1,7 @@
 var http = require("http");
 var restify = require('restify');
-var hello = require('./helloResource');
-var person = require('./personResource');
+var helloResource = require('./helloResource');
+var personResource = require('./personResource');
 
 function start() {
 
@@ -37,13 +37,14 @@ function start() {
 	//////////
 
 	// hello resource routing
-	server.get('/hello/:name', hello);
-	server.head('/hello/:name', hello);
+	server.get('/hello/:name', helloResource);
+	server.head('/hello/:name', helloResource);
 
 	// person resource routing
-	var PERSON_PATH = '/persons'
-	server.get({path : PERSON_PATH , version : '0.1.0'} , person.getToken);
-	server.post({path : PERSON_PATH , version: '0.1.0'}, person.create);
+	var PERSON_PATH = '/persons';
+	var TOKEN_PATH = '/persons/token';
+	server.get({path: TOKEN_PATH}, personResource.getToken);
+	server.post({path: PERSON_PATH}, personResource.create);
 	//server.del({path : PERSON_PATH +'/:jobId' , version: '0.1.0'} ,deleteJob);
 
 	// static files
