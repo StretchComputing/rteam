@@ -1,3 +1,4 @@
+/* global exports */
 'use strict';
 
 var Person = require('./models/person');
@@ -21,7 +22,7 @@ exports.create = function (req, res , next){
 };
 
 
-// handles GET: /persons
+// handles GET: /persons/token
 exports.getToken = function (req, res , next){
 	Person.getToken({
       name: req.query.name,
@@ -33,6 +34,27 @@ exports.getToken = function (req, res , next){
         // base64image: person.base64image
       });
       return next();
+  });
+};
+
+// handles GET: /persons
+exports.get = function (req, res , next){
+	Person.get({
+      token: req.query.token,
+      //deviceSignature: req.query.deviceSignature,
+  }, function (err, person, apiError) {
+      if (err) return next(err);
+      if (!person) {
+      	res.send(401);
+      } else if (apiError) {
+      	res.send(422, apiError);
+      } else {
+				res.send(200, {
+					token: person.token,
+					// base64image: person.base64image
+				});
+      }
+			return next();
   });
 };
 

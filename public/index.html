@@ -22,7 +22,7 @@
 
   <h2>Create Person</h2>
   <form id="createPerson">
-  	<label style="margin-right:5px;">name:</label><input type="text" id="name"><br>
+  	<label style="margin-right:5px;">name:</label><input type="text" name="name"><br>
   	<label style="margin-right:5px;">device signature:</label>
   	<input type="text" id="deviceSignature" value="1234567"><br>
   	<label style="margin-right:5px;">voice signature id:</label>
@@ -35,8 +35,25 @@
 
   <h2>Get Token</h2>
   <form id="getToken">
-  	<label style="margin-right:5px;">name:</label><input type="text" id="personName"><br>
+  	<label style="margin-right:5px;">name:</label><input type="text" name="name"><br>
     <button type="submit">Get Token</button>
+  </form>
+
+  <h2>Update Person</h2>
+  <form id="updatePerson">
+  	<fieldset>
+	  	<legend>skill</legend>
+	  	<label style="margin-right:5px;">name:</label><input type="text" name="name"><br>
+	  	<input type="radio" name="type" value="expert" checked><label style="margin-right:5px;">expert</label><br>
+	  	<input type="radio" name="type" value="learning"><label style="margin-right:5px;">learning</label><br>
+  	</fieldset>
+  	<fieldset>
+	  	<legend>notification frequency</legend>
+	  	<input type="radio" name="notificationFrequency" value="hourly" checked><label style="margin-right:5px;">hourly</label><br>
+	  	<input type="radio" name="notificationFrequency" value="daily"><label style="margin-right:5px;">daily</label><br>
+	  	<input type="radio" name="notificationFrequency" value="weekly"><label style="margin-right:5px;">weekly</label><br>
+  	</fieldset>
+    <button type="submit">Update Person</button>
   </form>
 
 <script src="//code.jquery.com/jquery-2.1.0.min.js"></script>
@@ -50,7 +67,7 @@
           alert('Please select an image');
           return;
         }
-        if (!$('#name').val()) {
+        if (!$('#createPerson input[name="name"]').val()) {
           alert('Please enter a name');
           return;
         }
@@ -59,7 +76,7 @@
           type: 'POST',
           url: '/persons',
           data: {
-            name: $('#name').val(),
+            name: $('#createPerson input[name="name"]').val(),
             base64image: $('#base64image').val(),
             deviceSignature: $('#deviceSignature').val(),
             voiceSignatureId: $('#voiceSignatureId').val()
@@ -92,7 +109,7 @@
 
       getToken = function () {
         event.preventDefault();
-        if (!$('#personName').val()) {
+        if (!$('#getToken input[name="name"]').val()) {
           alert('Please enter a name');
           return;
         }
@@ -101,7 +118,64 @@
           type: 'GET',
           url: '/persons/token',
           data: {
-            name: $('#personName').val(),
+            name: $('#createPerson input[name="name"]').val(),
+            // deviceSignature: $('#deviceSignature').val(),
+          },
+          success: function (data) {
+						sessionStorage.setItem('token', data.token);
+						getPerson();
+            console.log(data);
+          },
+          error: function (jqXHR, status) {
+            console.error(jqXHR, status);
+          }
+        });
+      },
+
+      getPerson = function () {
+        var token = sessionStorage.getItem('token');
+        if (!token) {
+          alert('Please call get Token first');
+          return;
+        }
+
+        $.ajax({
+          type: 'GET',
+          url: '/persons',
+          data: {
+            token: token,
+            // deviceSignature: $('#deviceSignature').val(),
+          },
+          success: function (data) {
+						$('#updatePerson input[name="type"]').val(data.skills[0].type);
+						$('#updatePerson input[name="name"]').val(data.skills[0].name);
+						$('#updatePerson input[name="notificationFrequency"]').val(data.notificationFrequency);
+            console.log(data);
+          },
+          error: function (jqXHR, status) {
+            console.error(jqXHR, status);
+          }
+        });
+      },
+
+      updatePerson = function () {
+        event.preventDefault();
+        var token = sessionStorage.getItem('token');
+        if (!token) {
+          alert('Please call get Token first');
+          return;
+        }
+
+        $.ajax({
+          type: 'PUT',
+          url: '/persons',
+          data: {
+            token: token,
+            skills: [{
+							type: $('#updatePerson input[name="type"]').val(),
+							name: $('#updatePerson input[name="name"]').val(),
+						}],
+						notificationFrequency: $('#updatePerson input[name="notificationFrequency"]').val(data.notificationFrequency),
             // deviceSignature: $('#deviceSignature').val(),
           },
           success: function (data) {
@@ -113,10 +187,10 @@
         });
       };
 
-
   $('#createPerson').on('submit', createPerson);
   $('#createPerson input[type=file]').on('change', previewFile);
   $('#getToken').on('submit', getToken);
+  $('#updatePerson').on('submit', updatePerson);
 }());
 </script>
 </body>

@@ -43,6 +43,8 @@ function start() {
 	// person resource routing
 	var PERSON_PATH = '/persons';
 	var TOKEN_PATH = '/persons/token';
+	server.get({path: PERSON_PATH}, personResource.get);
+	server.put({path: PERSON_PATH}, personResource.update);
 	server.get({path: TOKEN_PATH}, personResource.getToken);
 	server.post({path: PERSON_PATH}, personResource.create);
 	//server.del({path : PERSON_PATH +'/:jobId' , version: '0.1.0'} ,deleteJob);
