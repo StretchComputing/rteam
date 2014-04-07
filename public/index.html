@@ -42,10 +42,10 @@
   <h2>Update Person</h2>
   <form id="updatePerson">
   	<fieldset>
-	  	<legend>skill</legend>
-	  	<label style="margin-right:5px;">name:</label><input type="text" name="name"><br>
-	  	<input type="radio" name="type" value="expert" checked><label style="margin-right:5px;">expert</label><br>
-	  	<input type="radio" name="type" value="learning"><label style="margin-right:5px;">learning</label><br>
+	  	<legend>skills</legend>
+	  	<label style="margin-right:5px;">expert1:</label><input type="text" name="expert1"><br>
+	  	<label style="margin-right:5px;">expert2:</label><input type="text" name="expert2"><br>
+	  	<label style="margin-right:5px;">learning:</label><input type="text" name="learning"><br>
   	</fieldset>
   	<fieldset>
 	  	<legend>notification frequency</legend>
@@ -118,7 +118,7 @@
           type: 'GET',
           url: '/persons/token',
           data: {
-            name: $('#createPerson input[name="name"]').val(),
+            name: $('#getToken input[name="name"]').val(),
             // deviceSignature: $('#deviceSignature').val(),
           },
           success: function (data) {
@@ -147,9 +147,10 @@
             // deviceSignature: $('#deviceSignature').val(),
           },
           success: function (data) {
-						$('#updatePerson input[name="type"]').val(data.skills[0].type);
-						$('#updatePerson input[name="name"]').val(data.skills[0].name);
-						$('#updatePerson input[name="notificationFrequency"]').val(data.notificationFrequency);
+						$('#updatePerson input[name="expert1"]').val(data.expert1);
+						$('#updatePerson input[name="expert2"]').val(data.expert2);
+						$('#updatePerson input[name="learning"]').val(data.learning);
+						$('#updatePerson input[name="notificationFrequency"]').val([data.notificationFrequency || 'hourly']);
             console.log(data);
           },
           error: function (jqXHR, status) {
@@ -171,11 +172,10 @@
           url: '/persons',
           data: {
             token: token,
-            skills: [{
-							type: $('#updatePerson input[name="type"]').val(),
-							name: $('#updatePerson input[name="name"]').val(),
-						}],
-						notificationFrequency: $('#updatePerson input[name="notificationFrequency"]').val(data.notificationFrequency),
+						expert1: $('#updatePerson input[name="expert1"]').val(),
+						expert2: $('#updatePerson input[name="expert2"]').val(),
+						learning: $('#updatePerson input[name="learning"]').val(),
+						notificationFrequency: $('#updatePerson input[name="notificationFrequency"]:checked').val(),
             // deviceSignature: $('#deviceSignature').val(),
           },
           success: function (data) {

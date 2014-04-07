@@ -67,3 +67,7 @@ Open Issues
 1. Are all directories open in a node deployment?
 2. Does node have any support for deployment in general?
 
+===============
+Cypher Commands
+===============
+1. MATCH (n { voiceSignatureId: '123456890' }) DELETE n

@@ -85,6 +85,42 @@ var Person = module.exports = function (theNode) {
 				node.data.token = token;
 			}
 		});
+
+		Object.defineProperty(Person.prototype, 'expert1', {
+			get: function () {
+				return node.data.expert1;
+			},
+			set: function (expert1) {
+				node.data.expert1 = expert1;
+			}
+		});
+
+		Object.defineProperty(Person.prototype, 'expert2', {
+			get: function () {
+				return node.data.expert2;
+			},
+			set: function (expert2) {
+				node.data.expert2 = expert2;
+			}
+		});
+
+		Object.defineProperty(Person.prototype, 'learning', {
+			get: function () {
+				return node.data.learning;
+			},
+			set: function (learning) {
+				node.data.learning = learning;
+			}
+		});
+
+		Object.defineProperty(Person.prototype, 'notificationFrequency', {
+			get: function () {
+				return node.data.notificationFrequency;
+			},
+			set: function (notificationFrequency) {
+				node.data.notificationFrequency = notificationFrequency;
+			}
+		});
 	}
 };
 
@@ -193,29 +229,29 @@ Person.prototype.getFollowingAndOthers = function (callback) {
 // static methods: methods of the constructor function
 ///////////////////////////////////////////////////////
 // example code: not used in rTeam
-Person.get = function (id, callback) {
-    db.getNodeById(id, function (err, node) {
-        if (err) return callback(err);
-        callback(null, new Person(node));
-    });
-};
+// Person.get = function (id, callback) {
+//     db.getNodeById(id, function (err, node) {
+//         if (err) return callback(err);
+//         callback(null, new Person(node));
+//     });
+// };
 
 // example code: not used in rTeam
-Person.getAll = function (callback) {
-    db.getIndexedNodes(constants.indexName, constants.indexKey, constants.indexVal, function (err, nodes) {
-        // if (err) return callback(err);
-        // FIXME the index might not exist in the beginning, so special-case
-        // this error detection. warning: this is super brittle!
-        // the better and correct thing is to either ensure the index exists
-        // somewhere by creating it, or just use Neo4j's auto-indexing.
-        // (the Heroku Neo4j add-on doesn't support auto-indexing currently.)
-        if (err) return callback(null, []);
-        var users = nodes.map(function (node) {
-            return new Person(node);
-        });
-        callback(null, users);
-    });
-};
+// Person.getAll = function (callback) {
+//     db.getIndexedNodes(constants.indexName, constants.indexKey, constants.indexVal, function (err, nodes) {
+//         // if (err) return callback(err);
+//         // FIXME the index might not exist in the beginning, so special-case
+//         // this error detection. warning: this is super brittle!
+//         // the better and correct thing is to either ensure the index exists
+//         // somewhere by creating it, or just use Neo4j's auto-indexing.
+//         // (the Heroku Neo4j add-on doesn't support auto-indexing currently.)
+//         if (err) return callback(null, []);
+//         var users = nodes.map(function (node) {
+//             return new Person(node);
+//         });
+//         callback(null, users);
+//     });
+// };
 
 // Create Person
 // required fields were validated by calling routine, so no need to do it here
@@ -280,7 +316,81 @@ Person.getToken = function (person, callback) {
 	});
 };
 
-Person.createToken = function() {
+Person.get = function (person, callback) {
+	console.log('entering Person.get() token = ', person.token);
+	var query = [
+			'MATCH (n)',
+			'WHERE n.token = {token}',
+			'RETURN n',
+		].join('\n'),
+
+		params = {
+			token: parseFloat(person.token)
+		};
+
+	db.query(query, params, function (err, results) {
+		console.log('entering get db.query callback results = ', results);
+		if (err) { return callback(err); }
+    // key of return node comes from "RETURN n" in cypher query above
+    var node = results && results[0].n,
+				person;
+
+		if (!node) {
+			return callback();
+		}
+
+		person = new Person(node);
+
+		// TODO get the base64 image from the file
+		// person.saveImage(base64image);
+		// person.base64image = person.getImage();
+
+    callback(null, person);
+	});
+};
+
+Person.update = function (person, callback) {
+	console.log('entering Person.update() token = ', person.token);
+	var query = [
+			'MATCH (n)',
+			'WHERE n.token = {token}',
+			'SET n.expert1 = {expert1},',
+			'n.expert2 = {expert2},',
+			'n.learning = {learning},',
+			'n.notificationFrequency = {notificationFrequency}',
+			'RETURN n',
+		].join('\n'),
+
+		params = {
+			token: parseFloat(person.token),
+			expert1: person.expert1 || '',
+			expert2: person.expert2 || '',
+			learning: person.learning || '',
+			notificationFrequency: person.notificationFrequency || ''
+		};
+
+	db.query(query, params, function (err, results) {
+		console.log('entering update db.query callback results = ', results);
+		if (err) { return callback(err); }
+    // key of return node comes from "RETURN n" in cypher query above
+    var node = results && results[0].n,
+				person;
+
+		if (!node) {
+			return callback();
+		}
+
+		person = new Person(node);
+
+		// TODO get the base64 image from the file
+		// person.saveImage(base64image);
+		// person.base64image = person.getImage();
+
+    callback(null, person);
+	});
+};
+
+Person.createToken = function () {
 	// TODO create a 40 character hash
 	var min = 4000000,
 	    max = 10000000000;
@@ -293,3 +403,11 @@ Person.prototype.saveImage = function (base64image) {
 		console.log('saveImage', 'file written successfully');
 	});
 };
+
+// Person.prototype.getImage = function () {
+// 	fs.readFile(constants.imagePath + this.uniqId, function (err, data) {
+// 		if (err) { throw err; }
+// 		console.log('getImage', 'file read successfully');
+// 		return data;
+// 	});
+// };
