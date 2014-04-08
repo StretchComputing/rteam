@@ -19,109 +19,10 @@ var neo4j = require('neo4j'),
 	});
 
 // constructor is exported: this allows other modules to call the static methods defined below
-var Person = module.exports = function (theNode) {
-  var node = theNode;
-
-	if (!Person.prototype.id) {
-		// privileged methods
-		Object.defineProperty(Person.prototype, 'id', {
-			get: function () { return node.id; }
-		});
-
-		Object.defineProperty(Person.prototype, 'exists', {
-			get: function () { return node.exists; }
-		});
-
-		Object.defineProperty(Person.prototype, 'name', {
-			get: function () {
-				return node.data.name;
-			},
-			set: function (name) {
-				node.data.name = name;
-			}
-		});
-
-		Object.defineProperty(Person.prototype, 'uniqId', {
-			// TODO support generating this from name/phone/email qualifiier.
-			get: function () { return node.data.name.replace(' ', '.'); }
-		});
-
-		Object.defineProperty(Person.prototype, 'base64image', {
-			get: function () {
-				fs.readFile(constants.imagePath + this.uniqId, function (err, data) {
-					if (err) { throw err; }
-					console.log('Person.get.base64image', 'succeeded');
-					return data;
-				});
-			},
-			set: function (base64image) {
-				this.saveImage(base64image);
-			}
-		});
-
-		Object.defineProperty(Person.prototype, 'voiceSignatureId', {
-			get: function () {
-				return node.data.voiceSignatureId;
-			},
-			set: function (voiceSignatureId) {
-				node.data.voiceSignatureId = voiceSignatureId;
-			}
-		});
-
-		Object.defineProperty(Person.prototype, 'deviceSignature', {
-			get: function () {
-				return node.data.deviceSignature;
-			},
-			set: function (deviceSignature) {
-				node.data.deviceSignature = deviceSignature;
-			}
-		});
-
-		Object.defineProperty(Person.prototype, 'token', {
-			get: function () {
-				return node.data.token;
-			},
-			set: function (token) {
-				node.data.token = token;
-			}
-		});
-
-		Object.defineProperty(Person.prototype, 'expert1', {
-			get: function () {
-				return node.data.expert1;
-			},
-			set: function (expert1) {
-				node.data.expert1 = expert1;
-			}
-		});
-
-		Object.defineProperty(Person.prototype, 'expert2', {
-			get: function () {
-				return node.data.expert2;
-			},
-			set: function (expert2) {
-				node.data.expert2 = expert2;
-			}
-		});
-
-		Object.defineProperty(Person.prototype, 'learning', {
-			get: function () {
-				return node.data.learning;
-			},
-			set: function (learning) {
-				node.data.learning = learning;
-			}
-		});
-
-		Object.defineProperty(Person.prototype, 'notificationFrequency', {
-			get: function () {
-				return node.data.notificationFrequency;
-			},
-			set: function (notificationFrequency) {
-				node.data.notificationFrequency = notificationFrequency;
-			}
-		});
-	}
+var Person = module.exports = function (node) {
+	this.getNode = function () {
+		return node;
+	};
 };
 
 
@@ -148,25 +49,126 @@ Person.prototype._getExpertInRel = function (skill, callback) {
 };
 
 ///////////////////////////////////////////////////////////////////////////
+// privileged instance methods: inherited by any instance of the Person 'class'
+///////////////////////////////////////////////////////////////////////////
+Object.defineProperty(Person.prototype, 'id', {
+	get: function () { return this.getNode().id; }
+});
+
+Object.defineProperty(Person.prototype, 'exists', {
+	get: function () { return this.getNode().exists; }
+});
+
+Object.defineProperty(Person.prototype, 'name', {
+	get: function () {
+		return this.getNode().data.name;
+	},
+	set: function (name) {
+		this.getNode().data.name = name;
+	}
+});
+
+Object.defineProperty(Person.prototype, 'uniqId', {
+	// TODO support generating this from name/phone/email qualifiier.
+	get: function () { return this.getNode().data.name.replace(' ', '.'); }
+});
+
+Object.defineProperty(Person.prototype, 'base64image', {
+	get: function () {
+		fs.readFile(constants.imagePath + this.uniqId, function (err, data) {
+			if (err) { throw err; }
+			console.log('Person.get.base64image', 'succeeded');
+			return data;
+		});
+	},
+	set: function (base64image) {
+		this.saveImage(base64image);
+	}
+});
+
+Object.defineProperty(Person.prototype, 'voiceSignatureId', {
+	get: function () {
+		return this.getNode().data.voiceSignatureId;
+	},
+	set: function (voiceSignatureId) {
+		this.getNode().data.voiceSignatureId = voiceSignatureId;
+	}
+});
+
+Object.defineProperty(Person.prototype, 'deviceSignature', {
+	get: function () {
+		return this.getNode().data.deviceSignature;
+	},
+	set: function (deviceSignature) {
+		this.getNode().data.deviceSignature = deviceSignature;
+	}
+});
+
+Object.defineProperty(Person.prototype, 'token', {
+	get: function () {
+		return this.getNode().data.token;
+	},
+	set: function (token) {
+		this.getNode().data.token = token;
+	}
+});
+
+Object.defineProperty(Person.prototype, 'expert1', {
+	get: function () {
+		return this.getNode().data.expert1;
+	},
+	set: function (expert1) {
+		this.getNode().data.expert1 = expert1;
+	}
+});
+
+Object.defineProperty(Person.prototype, 'expert2', {
+	get: function () {
+		return this.getNode().data.expert2;
+	},
+	set: function (expert2) {
+		this.getNode().data.expert2 = expert2;
+	}
+});
+
+Object.defineProperty(Person.prototype, 'learning', {
+	get: function () {
+		return this.getNode().data.learning;
+	},
+	set: function (learning) {
+		this.getNode().data.learning = learning;
+	}
+});
+
+Object.defineProperty(Person.prototype, 'notificationFrequency', {
+	get: function () {
+		return this.getNode().data.notificationFrequency;
+	},
+	set: function (notificationFrequency) {
+		this.getNode().data.notificationFrequency = notificationFrequency;
+	}
+});
+
+///////////////////////////////////////////////////////////////////////////
 // public instance methods: inherited by any instance of the Person 'class'
 ///////////////////////////////////////////////////////////////////////////
 
 Person.prototype.save = function (callback) {
-    node.save(function (err) {
-        callback(err);
-    });
+  this.getNode().save(function (err) {
+    callback(err);
+  });
 };
 
 // example code: not used in rTeam
 Person.prototype.del = function (callback) {
-    node.del(function (err) {
-        callback(err);
-    }, true);   // true = yes, force it (delete all relationships)
+  this.getNode().del(function (err) {
+    callback(err);
+  }, true);   // true = yes, force it (delete all relationships)
 };
 
 // example code: not used in rTeam
 Person.prototype.follow = function (other, callback) {
-    node.createRelationshipTo(other.node, 'follows', {}, function (err, rel) {
+    this.getNode().createRelationshipTo(other.node, 'follows', {}, function (err, rel) {
         callback(err);
     });
 };
@@ -308,6 +310,8 @@ Person.getToken = function (person, callback) {
     var node = results[0].n,
 				person = new Person(node);
 
+		console.log('after creating new Person from retrieved node');
+		console.log('Person retrieved from db in getToken', person.token);
 		// TODO get the base64 image from the file
 		// person.saveImage(base64image);
 		// person.base64image = base64image;
@@ -393,7 +397,7 @@ Person.update = function (person, callback) {
 Person.createToken = function () {
 	// TODO create a 40 character hash
 	var min = 4000000,
-	    max = 10000000000;
+			max = 10000000000;
 	return Math.random() * (max - min) + min;
 };
 
