@@ -20,57 +20,57 @@ var neo4j = require('neo4j'),
 
 // constructor is exported: this allows other modules to call the static methods defined below
 var Person = module.exports = function (node) {
-	this.getNode = function () {
-		return node;
+	this.getData = function () {
+		return node.data;
+	};
+
+	this.getId = function () {
+		return node.id;
 	};
 };
 
 
-// private instance methods:
-// example code: not used in rTeam
-Person.prototype._getExpertInRel = function (skill, callback) {
-	var query = [
-			'START person=node({personId}), skill=node({skillId})',
-			'MATCH (person) -[rel?:EXPERT_IN_REL]-> (skill)',
-			'RETURN rel'
-		].join('\n')
-		.replace('EXPERT_IN_REL', constants.expertInRel),
+// // private instance methods:
+// // example code: not used in rTeam
+// Person.prototype._getExpertInRel = function (skill, callback) {
+// 	var query = [
+// 			'START person=node({personId}), skill=node({skillId})',
+// 			'MATCH (person) -[rel?:EXPERT_IN_REL]-> (skill)',
+// 			'RETURN rel'
+// 		].join('\n')
+// 		.replace('EXPERT_IN_REL', constants.expertInRel),
 
-		params = {
-			userId: this.id,
-			otherId: other.id,
-		};
+// 		params = {
+// 			userId: this.id,
+// 			otherId: other.id,
+// 		};
 
-	db.query(query, params, function (err, results) {
-		if (err) { return callback(err); }
-		var rel = results[0] && results[0].rel;
-		callback(null, rel);
-	});
-};
+// 	db.query(query, params, function (err, results) {
+// 		if (err) { return callback(err); }
+// 		var rel = results[0] && results[0].rel;
+// 		callback(null, rel);
+// 	});
+// };
 
 ///////////////////////////////////////////////////////////////////////////
 // privileged instance methods: inherited by any instance of the Person 'class'
 ///////////////////////////////////////////////////////////////////////////
 Object.defineProperty(Person.prototype, 'id', {
-	get: function () { return this.getNode().id; }
-});
-
-Object.defineProperty(Person.prototype, 'exists', {
-	get: function () { return this.getNode().exists; }
+	get: function () { return this.getId(); }
 });
 
 Object.defineProperty(Person.prototype, 'name', {
 	get: function () {
-		return this.getNode().data.name;
+		return this.getData().name;
 	},
 	set: function (name) {
-		this.getNode().data.name = name;
+		this.getData().name = name;
 	}
 });
 
 Object.defineProperty(Person.prototype, 'uniqId', {
 	// TODO support generating this from name/phone/email qualifiier.
-	get: function () { return this.getNode().data.name.replace(' ', '.'); }
+	get: function () { return this.getData().name.replace(' ', '.'); }
 });
 
 Object.defineProperty(Person.prototype, 'base64image', {
@@ -88,144 +88,110 @@ Object.defineProperty(Person.prototype, 'base64image', {
 
 Object.defineProperty(Person.prototype, 'voiceSignatureId', {
 	get: function () {
-		return this.getNode().data.voiceSignatureId;
+		return this.getData().voiceSignatureId;
 	},
 	set: function (voiceSignatureId) {
-		this.getNode().data.voiceSignatureId = voiceSignatureId;
+		this.getData().voiceSignatureId = voiceSignatureId;
 	}
 });
 
 Object.defineProperty(Person.prototype, 'deviceSignature', {
 	get: function () {
-		return this.getNode().data.deviceSignature;
+		return this.getData().deviceSignature;
 	},
 	set: function (deviceSignature) {
-		this.getNode().data.deviceSignature = deviceSignature;
+		this.getData().deviceSignature = deviceSignature;
 	}
 });
 
 Object.defineProperty(Person.prototype, 'token', {
 	get: function () {
-		return this.getNode().data.token;
+		return this.getData().token;
 	},
 	set: function (token) {
-		this.getNode().data.token = token;
+		this.getData().token = token;
 	}
 });
 
 Object.defineProperty(Person.prototype, 'expert1', {
 	get: function () {
-		return this.getNode().data.expert1;
+		return this.getData().expert1;
 	},
 	set: function (expert1) {
-		this.getNode().data.expert1 = expert1;
+		this.getData().expert1 = expert1;
 	}
 });
 
 Object.defineProperty(Person.prototype, 'expert2', {
 	get: function () {
-		return this.getNode().data.expert2;
+		return this.getData().expert2;
 	},
 	set: function (expert2) {
-		this.getNode().data.expert2 = expert2;
+		this.getData().expert2 = expert2;
 	}
 });
 
 Object.defineProperty(Person.prototype, 'learning', {
 	get: function () {
-		return this.getNode().data.learning;
+		return this.getData().learning;
 	},
 	set: function (learning) {
-		this.getNode().data.learning = learning;
+		this.getData().learning = learning;
 	}
 });
 
 Object.defineProperty(Person.prototype, 'notificationFrequency', {
 	get: function () {
-		return this.getNode().data.notificationFrequency;
+		return this.getData().notificationFrequency;
 	},
 	set: function (notificationFrequency) {
-		this.getNode().data.notificationFrequency = notificationFrequency;
+		this.getData().notificationFrequency = notificationFrequency;
 	}
 });
 
-///////////////////////////////////////////////////////////////////////////
-// public instance methods: inherited by any instance of the Person 'class'
-///////////////////////////////////////////////////////////////////////////
-
-Person.prototype.save = function (callback) {
-  this.getNode().save(function (err) {
-    callback(err);
-  });
-};
-
-// example code: not used in rTeam
-Person.prototype.del = function (callback) {
-  this.getNode().del(function (err) {
-    callback(err);
-  }, true);   // true = yes, force it (delete all relationships)
-};
-
-// example code: not used in rTeam
-Person.prototype.follow = function (other, callback) {
-    this.getNode().createRelationshipTo(other.node, 'follows', {}, function (err, rel) {
-        callback(err);
-    });
-};
-
-// example code: not used in rTeam
-Person.prototype.unfollow = function (other, callback) {
-    this._getFollowingRel(other, function (err, rel) {
-        if (err) return callback(err);
-        if (!rel) return callback(null);
-        rel.del(function (err) {
-            callback(err);
-        });
-    });
-};
 
 // calls callback w/ (err, following, others) where following is an array of
 // users this user follows, and others is all other users minus him/herself.
 // example code: not used in rTeam
-Person.prototype.getFollowingAndOthers = function (callback) {
-    // query all users and whether we follow each one or not:
-    var query = [
-        'START user=node({userId}), other=node:INDEX_NAME(INDEX_KEY="INDEX_VAL")',
-        'MATCH (user) -[rel?:FOLLOWS_REL]-> (other)',
-        'RETURN other, COUNT(rel)'  // COUNT(rel) is a hack for 1 or 0
-    ].join('\n')
-        .replace('INDEX_NAME', constants.indexName)
-        .replace('INDEX_KEY', constants.indexKey)
-        .replace('INDEX_VAL', constants.indexVal)
-        .replace('FOLLOWS_REL', constants.followsRel);
+// Person.prototype.getFollowingAndOthers = function (callback) {
+//     // query all users and whether we follow each one or not:
+//     var query = [
+//         'START user=node({userId}), other=node:INDEX_NAME(INDEX_KEY="INDEX_VAL")',
+//         'MATCH (user) -[rel?:FOLLOWS_REL]-> (other)',
+//         'RETURN other, COUNT(rel)'  // COUNT(rel) is a hack for 1 or 0
+//     ].join('\n')
+//         .replace('INDEX_NAME', constants.indexName)
+//         .replace('INDEX_KEY', constants.indexKey)
+//         .replace('INDEX_VAL', constants.indexVal)
+//         .replace('FOLLOWS_REL', constants.followsRel);
 
-    var params = {
-        userId: this.id,
-    };
+//     var params = {
+//         userId: this.id,
+//     };
 
-    var user = this;
-    db.query(query, params, function (err, results) {
-        if (err) return callback(err);
+//     var user = this;
+//     db.query(query, params, function (err, results) {
+//         if (err) return callback(err);
 
-        var following = [];
-        var others = [];
+//         var following = [];
+//         var others = [];
 
-        for (var i = 0; i < results.length; i++) {
-            var other = new Person(results[i]['other']);
-            var follows = results[i]['COUNT(rel)'];
+//         for (var i = 0; i < results.length; i++) {
+//             var other = new Person(results[i]['other']);
+//             var follows = results[i]['COUNT(rel)'];
 
-            if (user.id === other.id) {
-                continue;
-            } else if (follows) {
-                following.push(other);
-            } else {
-                others.push(other);
-            }
-        }
+//             if (user.id === other.id) {
+//                 continue;
+//             } else if (follows) {
+//                 following.push(other);
+//             } else {
+//                 others.push(other);
+//             }
+//         }
 
-        callback(null, following, others);
-    });
-};
+//         callback(null, following, others);
+//     });
+// };
 
 ///////////////////////////////////////////////////////
 // static methods: methods of the constructor function
@@ -407,11 +373,3 @@ Person.prototype.saveImage = function (base64image) {
 		console.log('saveImage', 'file written successfully');
 	});
 };
-
-// Person.prototype.getImage = function () {
-// 	fs.readFile(constants.imagePath + this.uniqId, function (err, data) {
-// 		if (err) { throw err; }
-// 		console.log('getImage', 'file read successfully');
-// 		return data;
-// 	});
-// };
