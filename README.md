@@ -3,23 +3,20 @@ rTeam
 =====
 rTeam is a service for IT professionals that is curated by the rTeam Coop.  Key services are:
 
-	Portfolio Now
-	-------------
-	Build your interactive portfolio and then decide: who views it, when it is viewed, and for how long.
+Portfolio Now
+-------------
+Build your interactive portfolio and then decide: who views it, when it is viewed, and for how long.
 
-	Connect Me
-	----------
-	Connect to a fellow rTeam member to initiate meaningful collaboration. Connections are direct, personal and interactive.
+Connect Me
+----------
+Connect to a fellow rTeam member to initiate meaningful collaboration. Connections are direct, personal and interactive.
 
-
-	architecture
-	------------
-	* rTeam in a node.js application with a neo4j graph database.
-	* Mobile app is implemented with HTML5, backbone and jQuery mobile.
-	* Mobile app interfaces with the rTeam service via a REST API.
-	*
-
-
+architecture
+------------
+* rTeam in a node.js application with a neo4j graph database.
+* iOS Mobile app is implemented with Swift.
+* Mobile app interfaces with the rTeam service via a REST API.
+	
 ==========
 developers
 ==========
